@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScamShield | Smart Protection</title>
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css', v=2) }}">
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">🛡️</div>
+            <div><b>ScamShield</b><small>SMART PROTECTION</small></div>
+        </div>
+        <p class="nav-title">WORKSPACE</p>
+        <button class="nav active" data-view="dashboard">⌂ &nbsp; Dashboard</button>
+        <button class="nav" data-view="scanner">⌕ &nbsp; Scam Scanner</button>
+        <button class="nav" data-view="history">◷ &nbsp; Scan History</button>
+        <button class="nav" data-view="reports">▤ &nbsp; Reports</button>
+        <p class="nav-title">SECURITY CENTER</p>
+        <button class="nav" data-view="tips">✧ &nbsp; Safety Tips</button>
+        <button class="nav" data-view="learn">◎ &nbsp; Learn About Scams</button>
+        <div class="side-bottom">
+            <div class="mini-shield">🔐</div>
+            <b>Stay one step ahead.</b>
+            <p>Think before you click. Stay protected online.</p>
+            <span class="online"><i></i> Protection tools ready</span>
+        </div>
+        <button class="nav theme-button" id="themeButton">☼ &nbsp; Toggle Light / Dark</button>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">YOUR DIGITAL SAFETY HUB</p>
+                <h1 id="pageTitle">Security Dashboard <span>✦</span></h1>
+                <p class="sub">Welcome, {{ username }}! 👋 Your smarter way to spot suspicious activity.</p>
+            </div>
+            <div class="top-actions">
+                <span class="live"><i></i> SYSTEM READY</span>
+                <div class="avatar">{{ username[:1]|upper }}</div>
+                <a href="{{ url_for('logout') }}" class="logout-link" style="color: inherit; text-decoration: none; padding: 9px 12px; border: 1px solid currentColor; border-radius: 10px; font-size: 13px; font-weight: 600;">Logout</a>
+            </div>
+        </header>
+
+        <section class="hero">
+            <div class="hero-content">
+                <span class="pill">✦ YOUR DIGITAL BODYGUARD</span>
+                <h2>Don't trust.<br><span>Verify first.</span></h2>
+                <p>Scan suspicious messages and links before they put your personal information at risk.</p>
+                <button class="primary" onclick="showView('scanner')">Start a Security Scan <span>↗</span></button>
+                <div class="hero-note">🔒 &nbsp; Simple checks. Smarter decisions.</div>
+            </div>
+            <div class="hero-art">
+                <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="glow"></div>
+                <div class="big-shield">🛡️</div>
+                <div class="float-card card-top">✦ &nbsp; SCAM DETECTION</div>
+                <div class="float-card card-bottom"><span class="green-dot"></span> Ready to analyze</div>
+            </div>
+        </section>
+
+        <section class="stats">
+            <article class="stat"><div class="stat-icon pink">⌕</div><p>Total scans <span>↗</span></p><h3 id="totalScans">0</h3><small>Scans in this session</small></article>
+            <article class="stat"><div class="stat-icon purple">⚠</div><p>Suspicious results</p><h3 id="flaggedScans">0</h3><small>Flagged by basic checks</small></article>
+            <article class="stat"><div class="stat-icon mint">✓</div><p>Clear results</p><h3 id="clearScans">0</h3><small>No obvious warning patterns</small></article>
+            <article class="stat"><div class="stat-icon orange">◷</div><p>Last scan</p><h3 id="lastScan">—</h3><small>Your latest activity</small></article>
+        </section>
+
+        <section class="section-heading">
+            <div><p class="eyebrow">PROTECTION TOOLS</p><h2>What would you like to check?</h2></div>
+            <span class="small-label">CHOOSE A SCANNER ↘</span>
+        </section>
+
+        <section class="tools-grid">
+            <button class="tool tool-pink" onclick="selectScanner('message')"><div class="tool-head"><span class="tool-icon">✉</span><span class="arrow">↗</span></div><h3>Message Scanner</h3><p>Check SMS and suspicious text for common scam signals.</p><span class="tool-link">SCAN MESSAGE →</span></button>
+            <button class="tool tool-blue" onclick="selectScanner('url')"><div class="tool-head"><span class="tool-icon">↗</span><span class="arrow">↗</span></div><h3>Link / URL Scanner</h3><p>Look for suspicious URL patterns and phishing keywords.</p><span class="tool-link">CHECK A LINK →</span></button>
+            <button class="tool tool-green" onclick="selectScanner('phone')"><div class="tool-head"><span class="tool-icon">☎</span><span class="arrow">↗</span></div><h3>Phone Checker</h3><p>Check phone number format and review basic warning information.</p><span class="tool-link">CHECK NUMBER →</span></button>
+            <button class="tool tool-purple" onclick="selectScanner('email')"><div class="tool-head"><span class="tool-icon">＠</span><span class="arrow">↗</span></div><h3>Email Analyzer</h3><p>Review suspicious email text and common warning signs.</p><span class="tool-link">ANALYZE EMAIL →</span></button>
+        </section>
+
+        <section class="workspace" id="scanner">
+            <div class="workspace-title"><div><p class="eyebrow">INTELLIGENT ANALYSIS</p><h2>Quick Scan Lab <span>✳</span></h2></div><button class="reset" id="resetButton">↻ Reset</button></div>
+            <div class="scan-tabs">
+                <button class="scan-tab selected" data-type="message">✉ Message</button>
+                <button class="scan-tab" data-type="url">↗ URL / Link</button>
+                <button class="scan-tab" data-type="phone">☎ Phone</button>
+                <button class="scan-tab" data-type="email">＠ Email</button>
+            </div>
+            <label for="scanInput" id="inputLabel">Paste your suspicious message</label>
+            <textarea id="scanInput" placeholder="Example: Your account will be blocked! Verify your details immediately..."></textarea>
+            <div class="input-footer"><span id="inputHint">Never share your real OTP or password.</span><span id="charCount">0 characters</span></div>
+            <div class="scan-actions"><button class="primary" id="scanButton">✦ Analyze Now</button><button class="secondary" id="sampleButton">Try a Demo Example</button></div>
+            <div class="result" id="result" aria-live="polite"><div class="result-icon">✧</div><div><b>Waiting for your input</b><p>Your scan result will appear here.</p></div></div>
+            <p class="disclaimer">⚠ Demo tool: results are based on basic patterns, not a guarantee that content is safe or fraudulent.</p>
+        </section>
+
+        <section class="bottom-grid">
+            <div class="panel"><div class="panel-title"><h3>Recent Activity</h3><button class="text-button" onclick="showView('history')">View all ↗</button></div><div id="recentList" class="recent-list"><p class="empty">No scans yet. Start your first scan above.</p></div></div>
+            <div class="panel tips-panel"><div class="panel-title"><h3>Safety Reminder ✨</h3><span>01 / 04</span></div><div class="tip-feature">🔐</div><h3>Keep your OTP private.</h3><p>Banks and legitimate support teams should never ask you to reveal your OTP or password.</p><button class="text-button" onclick="showView('tips')">Explore safety tips ↗</button></div>
+        </section>
+
+        <section class="extra-view" id="historyView"><h2>Scan History</h2><p>Your scans in this browser session.</p><div id="fullHistory" class="recent-list"><p class="empty">No scan history yet.</p></div><button class="secondary" id="clearHistory">Clear History</button></section>
+        <section class="extra-view" id="reportsView"><h2>Security Reports</h2><p>Summary of scans completed during this browser session.</p><div class="report-cards"><div class="stat"><p>Total scans</p><h3 id="reportTotal">0</h3></div><div class="stat"><p>Suspicious</p><h3 id="reportFlagged">0</h3></div><div class="stat"><p>Other results</p><h3 id="reportClear">0</h3></div></div><button class="primary" id="exportButton">Export Session Report</button></section>
+        <section class="extra-view" id="tipsView"><h2>Safety Tips ✨</h2><div class="info-grid"><article class="info-card"><h3>🔐 Protect your OTP</h3><p>Never share OTPs, passwords or recovery codes with callers or message senders.</p></article><article class="info-card"><h3>🔗 Check before clicking</h3><p>Inspect the domain carefully. A familiar logo doesn't prove a website is genuine.</p></article><article class="info-card"><h3>💸 Avoid urgent payments</h3><p>Verify unexpected payment requests using a trusted contact method.</p></article><article class="info-card"><h3>📲 Verify the sender</h3><p>Caller ID and sender names can be spoofed. Don't rely on them alone.</p></article></div></section>
+        <section class="extra-view" id="learnView"><h2>Learn About Scams</h2><div class="info-grid"><article class="info-card"><h3>🎣 Phishing</h3><p>Messages or sites that imitate trusted organizations to steal information.</p></article><article class="info-card"><h3>🎁 Prize scams</h3><p>Unexpected winnings that demand fees or sensitive details to claim a reward.</p></article><article class="info-card"><h3>☎ Impersonation</h3><p>Someone pretends to be a bank, official or support agent to pressure you.</p></article><article class="info-card"><h3>💳 Payment scams</h3><p>Fraudulent requests that trick you into sending money or approving a payment.</p></article></div></section>
+        <footer>SCAMSHIELD © 2026 <span>Built for a safer digital world ✦</span></footer>
+    </main>
+</div>
+
+<script>
+"use strict";
+
+let scanType = "message";
+let historyItems = [];
+let stats = { total: 0, flagged: 0, clear: 0 };
+
+const input = document.getElementById("scanInput");
+const resultBox = document.getElementById("result");
+const scanButton = document.getElementById("scanButton");
+
+const configs = {
+    message: {
+        label: "Paste your suspicious message",
+        placeholder: "Example: Your account will be blocked! Verify your details immediately...",
+        hint: "Never share your real OTP or password.",
+        demo: "URGENT! Your bank account will be blocked. Verify your account and OTP immediately to claim your reward."
+    },
+    url: {
+        label: "Paste a suspicious URL",
+        placeholder: "Example: https://example.com/verify-account",
+        hint: "Don't open a suspicious link to test it.",
+        demo: "http://free-prize-example.invalid/claim-reward"
+    },
+    phone: {
+        label: "Enter a phone number",
+        placeholder: "Example: +91 90000 12345",
+        hint: "A number alone cannot prove a scam.",
+        demo: "+91 90000 12345"
+    },
+    email: {
+        label: "Paste suspicious email content",
+        placeholder: "Paste the email address, subject and message here...",
+        hint: "Remove private details before testing.",
+        demo: "From: support@example.invalid\nSubject: URGENT account suspended\nClick here to verify your password and claim your prize."
+    }
+};
+
+function setType(type) {
+    if (!Object.prototype.hasOwnProperty.call(configs, type)) return;
+
+    scanType = type;
+
+    document.querySelectorAll(".scan-tab").forEach(button => {
+        button.classList.toggle("selected", button.dataset.type === type);
+    });
+
+    document.getElementById("inputLabel").textContent = configs[type].label;
+    input.placeholder = configs[type].placeholder;
+    document.getElementById("inputHint").textContent = configs[type].hint;
+    input.value = "";
+    document.getElementById("charCount").textContent = "0 characters";
+
+    showResult("Waiting for your input", "Your scan result will appear here.", "");
+}
+
+function selectScanner(type) {
+    showView("scanner");
+    setType(type);
+    document.getElementById("scanner").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
+function showResult(title, description, kind) {
+    resultBox.className = "result" + (kind ? " " + kind : "");
+
+    const icon = kind === "danger" ? "⚠"
+        : kind === "success" ? "✓"
+        : kind === "warning" ? "!"
+        : "✧";
+
+    resultBox.replaceChildren();
+
+    const iconDiv = document.createElement("div");
+    iconDiv.className = "result-icon";
+    iconDiv.textContent = icon;
+
+    const content = document.createElement("div");
+    const heading = document.createElement("b");
+    heading.textContent = title;
+
+    const paragraph = document.createElement("p");
+    paragraph.textContent = description;
+
+    content.append(heading, paragraph);
+    resultBox.append(iconDiv, content);
+}
+
+document.querySelectorAll(".scan-tab").forEach(button => {
+    button.addEventListener("click", () => setType(button.dataset.type));
+});
+
+input.addEventListener("input", () => {
+    document.getElementById("charCount").textContent =
+        input.value.length + " characters";
+});
+
+document.getElementById("sampleButton").addEventListener("click", () => {
+    input.value = configs[scanType].demo;
+    input.dispatchEvent(new Event("input"));
+});
+
+document.getElementById("resetButton").addEventListener("click", () => {
+    setType(scanType);
+});
+
+// Scan and save the result in the database through Flask
+scanButton.addEventListener("click", async () => {
+    const value = input.value.trim();
+
+    if (!value) {
+        showResult(
+            "Please enter something to scan.",
+            "Add text, an email, a phone number or a link in the input box.",
+            "warning"
+        );
+        return;
+    }
+
+    scanButton.disabled = true;
+    scanButton.textContent = "Analyzing...";
+
+    try {
+        const response = await fetch("/scan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: scanType, value })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                showResult("Login required", "Please log in again.", "warning");
+                return;
+            }
+            throw new Error(data.error || "Scan failed.");
+        }
+
+        const suspicious = data.risk === "Suspicious";
+        const invalid = String(data.risk || "").startsWith("Invalid");
+        const kind = suspicious ? "danger" : invalid ? "warning" : "success";
+        const reasons = Array.isArray(data.reasons) ? data.reasons : [];
+
+        const description =
+            "Risk score: " + data.score + "/100. " +
+            (reasons.length
+                ? "Signals: " + reasons.join(", ")
+                : "No matching warning patterns were found.");
+
+        showResult(data.risk || "Scan complete", description, kind);
+
+        // Reload the actual database history
+        await loadHistory();
+    } catch (error) {
+        showResult(
+            "Unable to scan",
+            "Check the Flask server. " + error.message,
+            "warning"
+        );
+    } finally {
+        scanButton.disabled = false;
+        scanButton.textContent = "✦ Analyze Now";
+    }
+});
+
+// Load history saved for the logged-in user
+async function loadHistory() {
+    try {
+        const response = await fetch("/history");
+
+        if (response.status === 401) {
+            showResult("Login required", "Please log in again.", "warning");
+            return;
+        }
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Could not load history.");
+        }
+
+        historyItems = (data.history || []).map(item => ({
+            id: item.id,
+            type: item.scan_type,
+            value: item.scanned_value,
+            risk: item.risk,
+            score: Number(item.score) || 0,
+            reasons: item.reasons || [],
+            time: item.created_at || ""
+        }));
+
+        stats.total = historyItems.length;
+        stats.flagged = historyItems.filter(
+            item => item.risk === "Suspicious"
+        ).length;
+        stats.clear = stats.total - stats.flagged;
+
+        updateStats();
+        renderHistory();
+    } catch (error) {
+        console.error("History loading error:", error);
+        showResult(
+            "History unavailable",
+            "Could not load saved history. Check the Flask server.",
+            "warning"
+        );
+    }
+}
+
+function updateStats() {
+    document.getElementById("totalScans").textContent = stats.total;
+    document.getElementById("flaggedScans").textContent = stats.flagged;
+    document.getElementById("clearScans").textContent = stats.clear;
+
+    document.getElementById("reportTotal").textContent = stats.total;
+    document.getElementById("reportFlagged").textContent = stats.flagged;
+    document.getElementById("reportClear").textContent = stats.clear;
+
+    if (historyItems.length) {
+        const latestTime = historyItems[0].time;
+        document.getElementById("lastScan").textContent =
+            latestTime ? latestTime.slice(11, 16) : "Saved";
+    } else {
+        document.getElementById("lastScan").textContent = "—";
+    }
+}
+
+function renderHistory() {
+    const recent = document.getElementById("recentList");
+    const full = document.getElementById("fullHistory");
+
+    recent.replaceChildren();
+    full.replaceChildren();
+
+    if (!historyItems.length) {
+        recent.textContent = "";
+        full.textContent = "";
+
+        const recentEmpty = document.createElement("p");
+        recentEmpty.className = "empty";
+        recentEmpty.textContent = "No scans yet. Start your first scan above.";
+
+        const fullEmpty = document.createElement("p");
+        fullEmpty.className = "empty";
+        fullEmpty.textContent = "No scan history yet.";
+
+        recent.append(recentEmpty);
+        full.append(fullEmpty);
+        return;
+    }
+
+    function makeRow(item) {
+        const row = document.createElement("div");
+        row.className = "history-row";
+
+        const left = document.createElement("div");
+        const title = document.createElement("b");
+        title.textContent =
+            item.type.toUpperCase() + " · " + item.value.slice(0, 45);
+
+        const time = document.createElement("small");
+        time.textContent =
+            item.time + " · Score " + item.score + "/100";
+
+        left.append(title, time);
+
+        const badge = document.createElement("span");
+        badge.className =
+            item.risk === "Suspicious" ? "badge-danger" : "badge-safe";
+        badge.textContent = item.risk;
+
+        row.append(left, badge);
+        return row;
+    }
+
+    historyItems.slice(0, 4).forEach(item => {
+        recent.append(makeRow(item));
+    });
+
+    historyItems.forEach(item => {
+        full.append(makeRow(item));
+    });
+}
+
+function showView(view) {
+    const views = {
+        dashboard: ["Security Dashboard", null],
+        scanner: ["Scam Scanner", "scanner"],
+        history: ["Scan History", "historyView"],
+        reports: ["Security Reports", "reportsView"],
+        tips: ["Safety Tips", "tipsView"],
+        learn: ["Learn About Scams", "learnView"]
+    };
+
+    if (!views[view]) return;
+
+    document.querySelectorAll(".nav[data-view]").forEach(button => {
+        button.classList.toggle("active", button.dataset.view === view);
+    });
+
+    document.getElementById("pageTitle").textContent = views[view][0] + " ✦";
+
+    document.querySelectorAll(".extra-view").forEach(element => {
+        element.classList.remove("visible");
+    });
+
+    if (view === "dashboard") {
+        document.querySelector(".hero").scrollIntoView({ behavior: "smooth" });
+    } else if (view === "scanner") {
+        document.getElementById("scanner").scrollIntoView({ behavior: "smooth" });
+    } else {
+        const target = document.getElementById(views[view][1]);
+        target.classList.add("visible");
+        target.scrollIntoView({ behavior: "smooth" });
+    }
+}
+
+document.querySelectorAll(".nav[data-view]").forEach(button => {
+    button.addEventListener("click", () => showView(button.dataset.view));
+});
+
+document.getElementById("themeButton").addEventListener("click", () => {
+    document.body.classList.toggle("light");
+});
+
+// Clear saved database history
+document.getElementById("clearHistory").addEventListener("click", async () => {
+    if (!confirm("Are you sure you want to clear all your scan history?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch("/history/clear", {
+            method: "POST"
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Could not clear history.");
+        }
+
+        await loadHistory();
+        showResult("History cleared", data.message, "success");
+    } catch (error) {
+        showResult("Unable to clear history", error.message, "warning");
+    }
+});
+
+// Export the saved scan history
+document.getElementById("exportButton").addEventListener("click", () => {
+    const report = [
+        "ScamShield Scan History Report",
+        "Total scans: " + stats.total,
+        "Suspicious: " + stats.flagged,
+        "Other results: " + stats.clear,
+        "",
+        ...historyItems.map(item =>
+            `${item.time} | ${item.type} | ${item.risk} | ${item.score}/100 | ${item.value}`
+        )
+    ].join("\n");
+
+    const blob = new Blob([report], {
+        type: "text/plain;charset=utf-8"
+    });
+
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = "scamshield-report.txt";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(downloadUrl);
+});
+
+// Load history on every page load / refresh
+loadHistory();
+</script>
+</body>
+</html>
