@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScamShield | Account</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='auth.css') }}">
+</head>
+
+<body class="auth-page">
+
+    <main class="auth-card">
+
+        <div class="brand">🛡️ ScamShield</div>
+        <p class="tagline">YOUR DIGITAL SAFETY HUB</p>
+
+        {% if mode == 'signup' %}
+            <h1>Create Account</h1>
+            <p class="subtitle">
+                Join ScamShield and stay safer online.
+            </p>
+        {% else %}
+            <h1>Welcome Back!</h1>
+            <p class="subtitle">
+                Login to open your security dashboard.
+            </p>
+        {% endif %}
+
+        {% if error %}
+            <div class="notice error">{{ error }}</div>
+        {% endif %}
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="notice {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST"
+              action="{{ url_for('signup' if mode == 'signup' else 'login') }}">
+
+            {% if mode == 'signup' %}
+                <label for="username">Username</label>
+                <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    minlength="3"
+                    maxlength="40"
+                    placeholder="Enter your username"
+                    autocomplete="username"
+                    required
+                >
+            {% endif %}
+
+            <label for="email">Email Address</label>
+            <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+                required
+            >
+
+            <label for="password">Password</label>
+            <input
+                id="password"
+                name="password"
+                type="password"
+                minlength="6"
+                maxlength="128"
+                placeholder="Enter your password"
+                autocomplete="{% if mode == 'signup' %}new-password{% else %}current-password{% endif %}"
+                required
+            >
+
+            {% if mode == 'signup' %}
+                <label for="confirm_password">Confirm Password</label>
+                <input
+                    id="confirm_password"
+                    name="confirm_password"
+                    type="password"
+                    minlength="6"
+                    maxlength="128"
+                    placeholder="Re-enter your password"
+                    autocomplete="new-password"
+                    required
+                >
+            {% endif %}
+
+            <button type="submit">
+                {% if mode == 'signup' %}
+                    Create Account →
+                {% else %}
+                    Login →
+                {% endif %}
+            </button>
+
+        </form>
+
+        <div class="switch">
+            {% if mode == 'signup' %}
+                Already have an account?
+                <a href="{{ url_for('login') }}">Login</a>
+            {% else %}
+                Don't have an account?
+                <a href="{{ url_for('signup') }}">Sign Up</a>
+            {% endif %}
+        </div>
+
+        <p class="security">
+            🔒 Your password is stored as a secure hash.
+        </p>
+
+        <p class="footer-text">
+            ScamShield — Stay Alert. Stay Safe.
+        </p>
+
+    </main>
+
+    <script>
+        const signupForm = document.querySelector(
+            'form[action*="signup"]'
+        );
+
+        if (signupForm) {
+            signupForm.addEventListener("submit", function (event) {
+                const password =
+                    document.getElementById("password").value;
+
+                const confirmPassword =
+                    document.getElementById("confirm_password").value;
+
+                if (password !== confirmPassword) {
+                    event.preventDefault();
+                    alert("Passwords do not match!");
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
